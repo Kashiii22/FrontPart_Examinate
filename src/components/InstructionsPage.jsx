@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { Box, Typography, Button, Checkbox, FormControlLabel } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { styled } from '@mui/material/styles';
-import AssignmentIcon from '@mui/icons-material/Assignment'; // Import Assignment icon
-
+import AssignmentIcon from '@mui/icons-material/Assignment'; 
 const InstructionsContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
   display: 'flex',
@@ -88,7 +87,7 @@ export default function InstructionsPage() {
           Please read the following instructions carefully:
         </Typography>
         <InstructionItem>
-          1. The exam will commence at 9:00 PM on April 30, 2025.
+          1. The exam will commence at 10:00 AM on May 1, 2025.
         </InstructionItem>
         <InstructionItem>
           2. You are allotted 60 minutes to complete the test.

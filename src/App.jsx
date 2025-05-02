@@ -1,11 +1,10 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from "./components/Login.jsx";
-import WaitingPage from "./components/WaitingPage.jsx"; // Import WaitingPage
-import InstructionsPage from "./components/InstructionsPage.jsx"; // Import InstructionsPage
+import WaitingPage from "./components/WaitingPage.jsx";
+import InstructionsPage from "./components/InstructionsPage.jsx";
+import Submit from "./components/Submit.jsx";
 import { QuizProvider } from "./context/QuizContext";
-
-// Components used in the exam page
 import TopBar from "./components/TopBar";
 import Sidebar from "./components/Sidebar";
 import QuestionPanel from "./components/QuestionPanel";
@@ -58,16 +57,18 @@ function ExamPage() {
 
 function App() {
   return (
-    <QuizProvider>
-      <Router>
+    <Router>
+      <QuizProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/waiting" element={<WaitingPage />} />
           <Route path="/exam" element={<ExamPage />} />
-          <Route path="/" element={<InstructionsPage />} /> {/* New route for instructions */}
+          <Route path="/submit" element={<Submit />} />
+          <Route path="/" element={<InstructionsPage />} />
+          <Route path="*" element={<Navigate to="/exam" replace />} /> 
         </Routes>
-      </Router>
-    </QuizProvider>
+      </QuizProvider>
+    </Router>
   );
 }
 

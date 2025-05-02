@@ -93,9 +93,15 @@ const TopBar = () => {
     }
   };
 
+  // Calculate solved questions
+  const solvedCount = questions.reduce((count, q, index) => {
+    return questionStatus[q.id] === 'completed' ? count + 1 : count;
+  }, 0);
+  const totalCount = questions.length;
+
   return (
     <>
-      <AppBar position="static" sx={{ backgroundColor: '#1976d2', boxShadow: 'none' }}>
+      <AppBar position="static" sx={{ background: 'linear-gradient(to right, #1565c0, #42a5f5)', boxShadow: 'none' }}>
         <Toolbar sx={{
           justifyContent: "space-between",
           flexWrap: "wrap",
@@ -215,6 +221,11 @@ const TopBar = () => {
           sx: { p: 2, width: 300, borderRadius: '8px' }
         }}
       >
+        {/* Solved/Total Count */}
+        <Typography sx={{ fontSize: '1.2rem', fontWeight: 600, mb: 2, color: '#1976d2' }}>
+          Solved: {solvedCount}/{totalCount}
+        </Typography>
+
         {/* Legend */}
         <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-around' }}>
           <Chip icon={<CheckCircleIcon color="success" />} label="Solved" />

@@ -1,8 +1,9 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { QuizContext } from "../context/QuizContext";
-import { Typography, Radio, RadioGroup, FormControlLabel, Button, Divider, Slider, Box } from "@mui/material";
+import { Typography, Radio, RadioGroup, FormControlLabel, Button, Divider, Slider, Box, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import { styled } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 
 const Watermark = styled('div')({
   position: 'absolute',
@@ -27,12 +28,13 @@ const GradientUnderlineTypography = styled(Typography)({
   '&::after': {
     content: '""',
     position: 'absolute',
-    bottom: 0,
+    bottom: '0',
     left: 0,
     width: '100%',
     height: '4px',
     background: 'linear-gradient(to right, #42a5f5, #1976d2)',
     borderRadius: '2px',
+    bottom: '-6px',
   },
 });
 
@@ -47,21 +49,22 @@ const QuestionPanel = () => {
     setQuestionStatus, 
     visitedQuestions, 
     setVisitedQuestions, 
-    fontSize 
+    fontSize,
+    isQuizCompleted, // Added for clarity, though not used yet
+    setIsQuizCompleted // Ensure this is correctly destructured
   } = useContext(QuizContext);
   const question = questions[currentQuestion];
+  const navigate = useNavigate();
+  const [openDialog, setOpenDialog] = useState(false);
 
   const handleChange = (e) => {
     setAnswers({ ...answers, [question.id]: e.target.value });
-    if (!answers[question.id] && e.target.value) {
-      setQuestionStatus({ ...questionStatus, [question.id]: 'completed' });
-    }
   };
 
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
       setVisitedQuestions({ ...visitedQuestions, [question.id]: true });
-      setCurrentQuestion(currentQuestion + 1); // Move to next question without submission
+      setCurrentQuestion(currentQuestion + 1);
     }
   };
 
@@ -73,7 +76,7 @@ const QuestionPanel = () => {
   };
 
   const handleSubmit = () => {
-    if (questionStatus[question.id] !== 'review' && !answers[question.id]) {
+    if (!answers[question.id] && questionStatus[question.id] !== 'review') {
       alert("Choose at least one option");
       return;
     }
@@ -83,8 +86,25 @@ const QuestionPanel = () => {
       setVisitedQuestions({ ...visitedQuestions, [question.id]: true });
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      alert("Quiz completed!");
+      setOpenDialog(true);
     }
+  };
+
+  const handleConfirmSubmit = () => {
+    console.log("handleConfirmSubmit called");
+    setOpenDialog(false);
+    if (typeof setIsQuizCompleted === 'function') {
+      setIsQuizCompleted(true);
+      console.log("setIsQuizCompleted called, navigating to /submit");
+      navigate('/submit');
+      console.log("Navigation attempted");
+    } else {
+      console.error("setIsQuizCompleted is not a function");
+    }
+  };
+
+  const handleCancelSubmit = () => {
+    setOpenDialog(false);
   };
 
   const markForReview = () => {
@@ -92,8 +112,6 @@ const QuestionPanel = () => {
     setVisitedQuestions({ ...visitedQuestions, [question.id]: true });
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
-    } else {
-      alert("This is the last question. Quiz completed!");
     }
   };
 
@@ -105,12 +123,10 @@ const QuestionPanel = () => {
   };
 
   useEffect(() => {
-    if (!answers[question.id] && !visitedQuestions[question.id]) {
-      setQuestionStatus({ ...questionStatus, [question.id]: 'unattempted' });
-    } else if (answers[question.id] && !questionStatus[question.id]) {
-      setQuestionStatus({ ...questionStatus, [question.id]: 'completed' });
+    if (!visitedQuestions[question.id] && !answers[question.id]) {
+      setQuestionStatus((prev) => ({ ...prev, [question.id]: 'unattempted' }));
     }
-  }, [currentQuestion, answers, question.id, questionStatus, setQuestionStatus, visitedQuestions]);
+  }, [currentQuestion, question.id, visitedQuestions, answers]); // Removed questionStatus and setQuestionStatus from dependencies
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
 
@@ -132,7 +148,6 @@ const QuestionPanel = () => {
         <AssignmentIcon sx={{ fontSize: '12rem', color: '#1976d2' }} />
       </Watermark>
 
-      {/* Left Side: Question */}
       <div style={{
         flex: 1,
         paddingRight: { xs: 10, sm: 16 },
@@ -146,7 +161,8 @@ const QuestionPanel = () => {
             fontSize: { xs: `calc(${fontSize}px * 1.5)`, sm: `calc(${fontSize}px * 0.78125)` },
             wordBreak: 'break-word',
             marginTop: 4,
-            marginLeft: 5
+            marginBottom: '16px',
+            marginLeft: 5,
           }}
         >
           {question.title}
@@ -158,14 +174,13 @@ const QuestionPanel = () => {
             color: '#000',
             fontSize: { xs: `calc(${fontSize}px * 0.9)`, sm: `calc(${fontSize}px * 1.1)` },
             wordBreak: 'break-word',
-            marginLeft: 5
+            marginLeft: 5,
           }}
         >
           {question.body}
         </Typography>
       </div>
 
-      {/* Divider */}
       <Divider
         orientation={window.innerWidth < 600 ? "horizontal" : "vertical"}
         flexItem
@@ -173,11 +188,10 @@ const QuestionPanel = () => {
           margin: { xs: '8px 0', sm: '0 16px' },
           borderColor: '#ccc',
           borderWidth: window.innerWidth < 600 ? '1px' : '2px',
-          display: 'block'
+          display: 'block',
         }}
       />
 
-      {/* Right Side: Options and Buttons */}
       <div style={{
         flex: 1,
         display: 'flex',
@@ -200,9 +214,9 @@ const QuestionPanel = () => {
                   '&.Mui-checked': {
                     color: '#42a5f5',
                     '& .MuiSvgIcon-root': {
-                      fill: '#42a5f5'
-                    }
-                  }
+                      fill: '#42a5f5',
+                    },
+                  },
                 }} />}
                 label={opt}
                 sx={{ color: '#000', '& .MuiTypography-root': { fontSize: { xs: '0.9rem', sm: '1rem' }, wordBreak: 'break-word' } }}
@@ -226,10 +240,19 @@ const QuestionPanel = () => {
               fontWeight: 'bolder',
               border: 'none',
               '&:hover': {
-                background: 'none',
+                background: 'rgba(255, 0, 0, 0.1)',
                 boxShadow: 'none',
                 border: 'none',
-                color: 'none'
+                color: 'red',
+              },
+              '&:focus': {
+                outline: 'none',
+                boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.2)',
+              },
+              '&:active': {
+                background: 'rgba(255, 0, 0, 0.15)',
+                boxShadow: 'none',
+                border: 'none',
               },
             }}
           >
@@ -248,9 +271,21 @@ const QuestionPanel = () => {
               color: '#ffb300',
               textTransform: 'none',
               fontWeight: 'bolder',
+              border: 'none',
               '&:hover': {
                 background: 'rgba(255, 179, 0, 0.1)',
                 boxShadow: 'none',
+                border: 'none',
+              },
+              '&:focus': {
+                outline: 'none',
+                boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.2)',
+                border: 'none',
+              },
+              '&:active': {
+                background: 'rgba(255, 179, 0, 0.15)',
+                boxShadow: 'none',
+                border: 'none',
               },
             }}
           >
@@ -273,7 +308,6 @@ const QuestionPanel = () => {
         </div>
       </div>
 
-      {/* Bottom-Left Navigation */}
       <Box sx={{
         position: 'absolute',
         bottom: 15,
@@ -287,35 +321,43 @@ const QuestionPanel = () => {
         padding: 1,
         backgroundColor: '#fff',
         borderRadius: 4,
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        zIndex: 1000,
+        border: 'none',
+        boxShadow: '0 0 4px rgba(255, 255, 255, 0.1)',
       }}>
         <Button
           variant="contained"
           color="primary"
           onClick={handlePrevious}
           disabled={currentQuestion === 0}
-          sx={{ fontSize: { xs: '0.7rem', sm: '0.855rem' }, padding: { xs: '4px 8px', sm: '6px 12px' }, minWidth: '80px',minHeight:'60px' }}
+          sx={{ fontSize: { xs: '0.7rem', sm: '0.875rem' }, padding: { xs: '4px 8px', sm: '6px 12px' }, minWidth: '80px', marginBottom: '20px', marginRight: '450px' }}
         >
           Previous
         </Button>
-        <Slider
-          value={progress}
-          onChange={(e, v) => setCurrentQuestion(Math.round((v / 100) * (questions.length - 1)))}
-          aria-labelledby="progress-slider"
-          sx={{ color: '#1976d2', width: { xs: '90%', sm: '500px' }, mx: 1 }}
-          disabled={false}
-        />
         <Button
           variant="contained"
           color="primary"
           onClick={handleNext}
           disabled={currentQuestion === questions.length - 1}
-          sx={{ fontSize: { xs: '0.7rem', sm: '0.875rem' }, padding: { xs: '4px 8px', sm: '6px 12px' }, minWidth: '80px' }}
+          sx={{ fontSize: { xs: '0.7rem', sm: '0.875rem' }, padding: { xs: '4px 8px', sm: '6px 12px' }, minWidth: '80px', marginBottom: '20px' }}
         >
           Next
         </Button>
       </Box>
+
+      <Dialog open={openDialog} onClose={handleCancelSubmit}>
+        <DialogTitle>Confirm Submission</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to submit?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelSubmit} color="primary">
+            No
+          </Button>
+          <Button onClick={handleConfirmSubmit} color="primary" autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

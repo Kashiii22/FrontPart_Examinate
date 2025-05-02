@@ -4,7 +4,6 @@ import questions from "../data/dummy.js";
 export const QuizContext = createContext();
 
 export const QuizProvider = ({ children }) => {
-  // Fallback for questions if dummy.js is empty
   const safeQuestions = Array.isArray(questions) && questions.length > 0 ? questions : [];
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -18,6 +17,15 @@ export const QuizProvider = ({ children }) => {
   const [subjectName] = useState("Mathematics");
   const [examID] = useState("EXAM-2025-001");
   const [fontSize, setFontSize] = useState(16);
+  const [isQuizCompleted, setIsQuizCompleted] = useState(false); // Added
+
+  const resetQuiz = () => {
+    setCurrentQuestion(0);
+    setAnswers({});
+    setQuestionStatus(safeQuestions.reduce((acc, q) => ({ ...acc, [q.id]: 'unattempted' }), {}));
+    setVisitedQuestions(safeQuestions.reduce((acc, q) => ({ ...acc, [q.id]: false }), {}));
+    setIsQuizCompleted(false);
+  };
 
   return (
     <QuizContext.Provider
@@ -34,10 +42,13 @@ export const QuizProvider = ({ children }) => {
         subjectName,
         examID,
         fontSize,
-        setFontSize
+        setFontSize,
+        isQuizCompleted, // Added
+        setIsQuizCompleted, // Added
+        resetQuiz // Added
       }}
     >
       {children}
     </QuizContext.Provider>
   );
-}; 
+};

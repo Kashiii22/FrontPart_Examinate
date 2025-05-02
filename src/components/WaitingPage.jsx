@@ -66,7 +66,7 @@ export default function WaitingPage() {
   const [canStart, setCanStart] = useState(false);
 
   useEffect(() => {
-    const testStartTime = new Date("2025-04-30T21:00:00").getTime(); // 5:00 PM IST
+    const testStartTime = new Date("2025-05-01T10:00:00").getTime();
 
     const updateTimer = () => {
       const currentTime = new Date().getTime();
@@ -140,7 +140,7 @@ export default function WaitingPage() {
           Please Wait
         </motion.Typography>
         <motion.Typography variant="body1" gutterBottom variants={textVariants} initial="hidden" animate="visible" sx={{ fontSize: '2rem', fontWeight: 700 }}>
-          The test will start at 9:00 PM on April 30, 2025.
+          The test will start at 10:00 AM on May 1, 2025.
         </motion.Typography>
         <motion.Typography variant="h6" variants={textVariants} initial="hidden" animate="visible" sx={{ fontSize: '2.5rem', fontWeight: 700 }}>
           Time Remaining: {timeLeft || "Calculating..."}

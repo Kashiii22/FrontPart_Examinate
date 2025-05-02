@@ -7,8 +7,7 @@ import { useNavigate } from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import { styled } from '@mui/material/styles';
-import illustration from '../assets/heroImg2.png'; // Adjust the path based on your project structure
-
+import illustration from '../assets/heroImg2.png'; 
 const MainContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -142,37 +141,30 @@ export default function Login() {
     password: "",
   });
 
-  // Forgot Password State
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotPasswordStep, setForgotPasswordStep] = useState(1);
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
-  // Handle Login Form Change
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
     setLoginData({ ...loginData, [name]: value });
   };
 
-  // Handle Login Submit
   const handleLoginSubmit = (e) => {
     e.preventDefault();
     toast.success("Successfully Logged In");
     localStorage.setItem("token", "mock-token");
 
-    // Define test start time: 5:00 PM IST on April 30, 2025
-    const testStartTime = new Date("2025-04-30T21:00:00").getTime();
+    const testStartTime = new Date("2025-05-01T10:00:00").getTime();
     const currentTime = new Date().getTime();
 
-    // Compare current time with test start time
     if (currentTime < testStartTime) {
-      // Redirect to waiting page if before 5:00 PM
       setTimeout(() => {
         navigate("/waiting");
       }, 1500);
     } else {
-      // Redirect to exam page if at or after 5:00 PM
       setTimeout(() => {
         navigate("/exam");
       }, 1500);
@@ -181,7 +173,6 @@ export default function Login() {
     setLoginData({ email: "", password: "" });
   };
 
-  // Forgot Password Flow Handlers
   const openForgotPassword = () => {
     setShowForgotPassword(true);
     setForgotPasswordStep(1);
