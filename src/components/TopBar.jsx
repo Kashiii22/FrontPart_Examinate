@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from 'react-redux';
+import { setFontSize } from '../redux/quizSlice.js'; // Import setFontSize action
 import { AppBar, Toolbar, Typography, Box, Button, Popover, Grid, Chip, Slider } from "@mui/material";
-import { QuizContext } from "../context/QuizContext";
 import TimerIcon from '@mui/icons-material/Timer';
 import PersonIcon from '@mui/icons-material/Person';
 import SignalWifi4BarIcon from '@mui/icons-material/SignalWifi4Bar';
@@ -14,7 +15,9 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BatteryFullIcon from '@mui/icons-material/BatteryFull';
 
 const TopBar = () => {
-  const { subjectName, questions = [], questionStatus, fontSize, setFontSize } = useContext(QuizContext);
+  const dispatch = useDispatch();
+  const { subjectName, questions = [], questionStatus, fontSize } = useSelector((state) => state.quiz); // Access state from Redux
+
   const [signalStrength, setSignalStrength] = useState("unknown");
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -34,7 +37,7 @@ const TopBar = () => {
 
     const handleOnlineStatus = () => setIsOnline(navigator.onLine);
     window.addEventListener("online", handleOnlineStatus);
-    window.removeEventListener("offline", handleOnlineStatus);
+    window.addEventListener("offline", handleOnlineStatus); // Fixed: Should be "addEventListener"
 
     updateConnectionStatus();
 
@@ -94,14 +97,18 @@ const TopBar = () => {
   };
 
   // Calculate solved questions
-  const solvedCount = questions.reduce((count, q, index) => {
+  const solvedCount = questions.reduce((count, q) => {
     return questionStatus[q.id] === 'completed' ? count + 1 : count;
   }, 0);
   const totalCount = questions.length;
 
+  const handleFontSizeChange = (e, newValue) => {
+    dispatch(setFontSize(newValue)); // Dispatch setFontSize action
+  };
+
   return (
     <>
-      <AppBar position="static" sx={{ background: 'linear-gradient(to right, #1565c0, #42a5f5)', boxShadow: 'none' }}>
+      <AppBar position="static" sx={{ background: 'linear-gradient(to right,#1565c0, #42a5f5)', boxShadow: 'none' }}>
         <Toolbar sx={{
           justifyContent: "space-between",
           flexWrap: "wrap",
@@ -114,7 +121,7 @@ const TopBar = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <AssignmentIcon sx={{ fontSize: { xs: 24, sm: 30 } }} />
             <Typography variant="h6" sx={{ fontSize: { xs: '1rem', sm: '1.5rem' }, fontWeight: 600 }}>
-              {subjectName}
+              {subjectName || "Quiz"} {/* Fallback if subjectName is not set */}
             </Typography>
           </Box>
 
@@ -122,9 +129,9 @@ const TopBar = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2.5 }, flexWrap: 'wrap' }}>
             {/* Battery */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <BatteryFullIcon sx={{ fontSize: { xs: 18, sm: 24 }, color: batteryStatus < 0.2 ? 'red' : '#00cc00' }} />
+              <BatteryFullIcon sx={{ fontSize: { xs: 18, sm: 24 }, color: batteryStatus !== null && batteryStatus < 0.2 ? 'red' : '#00cc00' }} />
               <Typography sx={{ fontSize: { xs: '0.8rem', sm: '1rem' }, fontWeight: 500 }}>
-                {/* {Math.round(batteryStatus)} */}
+                {batteryStatus !== null ? `${Math.round(batteryStatus * 100)}%` : "N/A"}
               </Typography>
             </Box>
 
@@ -167,7 +174,7 @@ const TopBar = () => {
                 value={fontSize}
                 min={12}
                 max={24}
-                onChange={(e, newValue) => setFontSize(newValue)}
+                onChange={handleFontSizeChange}
                 valueLabelDisplay="auto"
                 valueLabelFormat={(value) => `${value}px`}
                 sx={{
@@ -236,7 +243,7 @@ const TopBar = () => {
         {/* Questions */}
         <Grid container spacing={1}>
           {questions.map((q, index) => (
-            <Grid item xs={2} key={index}>
+            <Grid item xs={2} key={q.id || index}>
               <Box sx={{
                 bgcolor: getColor(questionStatus[q.id]),
                 color: 'white',

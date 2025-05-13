@@ -70,6 +70,18 @@ const questions = [
     title: 'Linear Search',
     body: 'Search for an element in an unsorted array using linear search rfvevr.',
     options: ['1', '2', '3', '4']
+  },
+  {
+    id: 13,
+    title: 'Linear Search',
+    body: 'Search for an element in an unsorted array using linear search rfvevr.',
+    options: ['1', '2', '3', '4']
+  },
+  {
+    id: 14,
+    title: 'Linear Search',
+    body: 'Search for an element in an unsorted array using linear search rfvevr.',
+    options: ['1', '2', '3', '4']
   }
 ];
 

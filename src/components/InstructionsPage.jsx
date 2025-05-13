@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Box, Typography, Button, Checkbox, FormControlLabel } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { styled } from '@mui/material/styles';
-import AssignmentIcon from '@mui/icons-material/Assignment'; 
+import AssignmentIcon from '@mui/icons-material/Assignment';
+
 const InstructionsContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
   display: 'flex',
@@ -11,7 +12,7 @@ const InstructionsContainer = styled(Box)(({ theme }) => ({
   justifyContent: 'center',
   height: '100vh',
   width: '100vw',
-  padding: theme.spacing(2),
+  padding: { xs: theme.spacing(2), sm: theme.spacing(3), md: theme.spacing(4) }, // Responsive padding
   backgroundColor: '#fff',
   textAlign: 'center',
   boxSizing: 'border-box',
@@ -24,11 +25,11 @@ const LogoContainer = styled(Box)(({ theme }) => ({
 }));
 
 const InstructionsList = styled(Box)(({ theme }) => ({
-  maxWidth: '1000px', // Increased from 900px
-  maxHeight: '70vh', // Increased from 60vh
+  maxWidth: { xs: '100%', sm: '800px', md: '1000px' }, // Responsive maxWidth
+  maxHeight: { xs: '60vh', sm: '70vh' }, // Responsive maxHeight
   overflowY: 'auto',
   marginBottom: theme.spacing(3),
-  padding: theme.spacing(3),
+  padding: { xs: theme.spacing(2), sm: theme.spacing(3) }, // Responsive padding
   backgroundColor: '#fff',
   borderRadius: '12px',
   boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
@@ -36,7 +37,7 @@ const InstructionsList = styled(Box)(({ theme }) => ({
 }));
 
 const InstructionItem = styled(Typography)(({ theme }) => ({
-  fontSize: '1.2rem',
+  fontSize: { xs: '0.9rem', sm: '1.1rem', md: '1.2rem' }, // Responsive font size
   fontWeight: 500,
   textAlign: 'left',
   marginBottom: theme.spacing(1.5),
@@ -44,8 +45,8 @@ const InstructionItem = styled(Typography)(({ theme }) => ({
 }));
 
 const NextButton = styled(Button)(({ theme }) => ({
-  padding: theme.spacing(1.5, 3),
-  fontSize: '1.2rem',
+  padding: { xs: theme.spacing(1, 2), sm: theme.spacing(1.5, 3) }, // Responsive padding
+  fontSize: { xs: '1rem', sm: '1.2rem' }, // Responsive font size
   fontWeight: 'bold',
   borderRadius: '10px',
   backgroundColor: '#1976d2',
@@ -75,15 +76,31 @@ export default function InstructionsPage() {
   };
 
   return (
-    <InstructionsContainer>
+    <InstructionsContainer  >
       <LogoContainer>
-        <AssignmentIcon sx={{ fontSize: '64px', color: '#1976d2' }} />
+        <AssignmentIcon sx={{ fontSize: { xs: '48px', sm: '64px' }, color: '#1976d2' }} />
       </LogoContainer>
-      <Typography variant="h2" sx={{ fontSize: '2.8rem', fontWeight: 900, color: '#1976d2', marginBottom: 3 }}>
+      <Typography 
+        variant="h2" 
+        sx={{ 
+          fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.8rem' }, // Responsive font size
+          fontWeight: 900, 
+          color: '#1976d2', 
+          marginBottom: 3 
+        }}
+      >
         Exam Instructions
       </Typography>
       <InstructionsList>
-        <Typography variant="h6" sx={{ fontSize: '1.6rem', fontWeight: 700, color: '#1976d2', marginBottom: 2 }}>
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            fontSize: { xs: '1.2rem', sm: '1.4rem', md: '1.6rem' }, // Responsive font size
+            fontWeight: 700, 
+            color: '#1976d2', 
+            marginBottom: 2 
+          }}
+        >
           Please read the following instructions carefully:
         </Typography>
         <InstructionItem>
@@ -118,7 +135,17 @@ export default function InstructionsPage() {
         </InstructionItem>
         <FormControlLabel
           control={<Checkbox checked={isConfirmed} onChange={handleConfirm} sx={{ color: '#1976d2' }} />}
-          label={<Typography sx={{ fontSize: '1.2rem', fontWeight: 500, color: '#333' }}>I have read and understood the instructions</Typography>}
+          label={
+            <Typography 
+              sx={{ 
+                fontSize: { xs: '0.9rem', sm: '1.1rem', md: '1.2rem' }, // Responsive font size
+                fontWeight: 500, 
+                color: '#333' 
+              }}
+            >
+              I have read and understood the instructions
+            </Typography>
+          }
         />
       </InstructionsList>
       <NextButton

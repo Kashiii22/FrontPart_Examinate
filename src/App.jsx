@@ -1,10 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Provider } from 'react-redux'; // Add Redux Provider
+import { store } from './redux/store.js'; // Import the Redux store
 import Login from "./components/Login.jsx";
 import WaitingPage from "./components/WaitingPage.jsx";
 import InstructionsPage from "./components/InstructionsPage.jsx";
 import Submit from "./components/Submit.jsx";
-import { QuizProvider } from "./context/QuizContext";
 import TopBar from "./components/TopBar";
 import Sidebar from "./components/Sidebar";
 import QuestionPanel from "./components/QuestionPanel";
@@ -43,6 +44,9 @@ function ExamPage() {
             padding: "20px",
             marginRight: "20px",
             height: "100%",
+            boxSizing: "border-box", // Ensure padding doesn't affect height
+            display: 'flex', // Ensure Sidebar takes full height
+            flexDirection: 'column',
           }}
         >
           <Sidebar />
@@ -57,18 +61,18 @@ function ExamPage() {
 
 function App() {
   return (
-    <Router>
-      <QuizProvider>
+    <Provider store={store}> {/* Replace QuizProvider with Redux Provider */}
+      <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/waiting" element={<WaitingPage />} />
           <Route path="/exam" element={<ExamPage />} />
           <Route path="/submit" element={<Submit />} />
           <Route path="/" element={<InstructionsPage />} />
-          <Route path="*" element={<Navigate to="/exam" replace />} /> 
+          <Route path="*" element={<Navigate to="/exam" replace />} />
         </Routes>
-      </QuizProvider>
-    </Router>
+      </Router>
+    </Provider>
   );
 }
 

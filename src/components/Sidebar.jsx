@@ -1,21 +1,14 @@
-import React, { useContext, useEffect, useRef } from "react";
-import { QuizContext } from "../context/QuizContext";
+import React, { useEffect, useRef } from "react";
+import { useSelector, useDispatch } from 'react-redux';
+import { setCurrentQuestion } from '../redux/quizSlice.js';
 import { Box, Stepper, Step, StepLabel } from "@mui/material";
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 export default function Sidebar() {
-  const { questions, currentQuestion, setCurrentQuestion, questionStatus } = useContext(QuizContext);
-  const [activeStep, setActiveStep] = React.useState(currentQuestion);
-  const [isScrollable, setIsScrollable] = React.useState(false);
-  const sidebarRef = useRef(null);
+  const dispatch = useDispatch();
+  const { questions, currentQuestion, questionStatus } = useSelector((state) => state.quiz);
 
-  const handleScroll = () => {
-    const sidebar = sidebarRef.current;
-    const isBottom = sidebar.scrollHeight === sidebar.scrollTop + sidebar.clientHeight;
-    setIsScrollable(!isBottom);
-  };
+  const [activeStep, setActiveStep] = React.useState(currentQuestion);
+  const sidebarRef = useRef(null);
 
   useEffect(() => {
     setActiveStep(currentQuestion);
@@ -26,64 +19,101 @@ export default function Sidebar() {
     id: q.id, 
   }));
 
-  console.log("Number of steps in Sidebar:", steps.length); // Debugging log
+  console.log("Number of steps in Sidebar:", steps.length); 
 
   const CustomStepIcon = (props) => {
     const { icon } = props; 
     const stepIndex = icon ? icon - 1 : 0; 
     const stepId = questions[stepIndex]?.id; 
 
-    if (!stepId || questionStatus[stepId] === 'unattempted') {
-      return null;
+    let backgroundColor = '#e0e0e0'; 
+    let border = 'none';
+    let color = '#000';
+
+    if (stepId) {
+      if (questionStatus[stepId] === 'completed') {
+        backgroundColor = '#42a5f5'; 
+        color = '#fff';
+      } else if (questionStatus[stepId] === 'review') {
+        border = '2px solid #ffb300'; 
+        backgroundColor = 'transparent';
+        color = '#ffb300';
+      }
     }
 
-    const iconColor = questionStatus[stepId] === 'completed' ? '#42a5f5' : '#ffb300'; 
-
     return (
-      <CheckCircleIcon
+      <Box
         sx={{
-          color: iconColor,
-          fontSize: '1.5rem',
+          width: { xs: 20, sm: 24 }, // Responsive size
+          height: { xs: 20, sm: 24 }, // Responsive size
+          borderRadius: '50%',
+          backgroundColor: backgroundColor,
+          border: border,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: color,
+          fontSize: { xs: '0.7rem', sm: '0.9rem' }, // Responsive font size
+          fontWeight: 'bold',
         }}
-      />
+      >
+        {icon}
+      </Box>
     );
   };
 
   const handleQuestionClick = (index) => {
-    setCurrentQuestion(index); 
+    dispatch(setCurrentQuestion(index));
   };
 
   return (
-    <Box sx={{ maxWidth: 400, position: 'relative' }}>
+    <Box sx={{ 
+      maxWidth: { xs: 200, sm: 300, md: 400 }, // Responsive maxWidth
+      position: 'relative',
+    }}>
       <Box
         ref={sidebarRef}
         sx={{
-          maxHeight: 'calc(100vh - 80px)', // Adjusted to match TopBar height (80px)
+          maxHeight: { xs: 'calc(100vh - 60px)', sm: 'calc(100vh - 80px)' }, // Responsive maxHeight
           overflowY: 'auto',
-          paddingTop: '8px',
-          paddingBottom: '20px', // Reduced to allow more scrollable space
+          paddingTop: { xs: '2px', sm: '4px' }, // Responsive padding
+          paddingBottom: { xs: '4px', sm: '8px' }, // Responsive padding
+          scrollBehavior: 'smooth',
+          overscrollBehavior: 'contain',
           scrollbarWidth: 'none',
-          WebkitOverflowScrolling: 'touch',
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
         }}
-        onScroll={handleScroll}
       >
-        <Stepper activeStep={activeStep} orientation="vertical">
+        <Stepper
+          activeStep={activeStep}
+          orientation="vertical"
+          sx={{
+            marginTop: 0,
+            paddingTop: '0px',
+            '& .MuiStep-root': {
+              padding: { xs: '1px 0', sm: '2px 0' }, // Responsive padding
+            },
+          }}
+        >
           {steps.map((step, index) => (
             <Step key={step.id || index} completed={questionStatus[step.id] === 'completed'}>
               <StepLabel
                 StepIconComponent={CustomStepIcon}
                 sx={{
-                  fontSize: '1rem',
+                  fontSize: { xs: '0.8rem', sm: '1rem' }, // Responsive font size
                   fontWeight: 'bold',
                   transition: 'all 0.3s ease',
-                  '&:hover': {
-                    transform: 'scale(1.1)',
-                    backgroundColor: 'rgba(25, 118, 210, 0.1)',
-                  },
+                  // '&:hover': {
+                  //   transform: 'scale(1.1)',
+                  //   backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                  // },
+                  padding: { xs: '1px 0', sm: '2px 0' }, // Responsive padding
+                  cursor: 'pointer',
                 }}
                 onClick={() => handleQuestionClick(index)}
               >
-                {step.label}
               </StepLabel>
             </Step>
           ))}

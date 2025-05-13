@@ -7,24 +7,21 @@ import { useNavigate } from "react-router-dom";
 import CloseIcon from '@mui/icons-material/Close';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import { styled } from '@mui/material/styles';
-import illustration from '../assets/heroImg2.png'; 
+import illustration from '../assets/heroImg2.png';
+
 const MainContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
-  flexDirection: 'row',
+  flexDirection: { xs: 'column', md: 'row' },
   height: '100vh',
   minHeight: '100vh',
   width: '100vw',
   alignItems: 'center',
   justifyContent: 'center',
   overflow: 'hidden',
-  maxWidth: '1200px',
+  maxWidth: { xs: '100%', sm: '800px', md: '1200px' },
   margin: '0 auto',
   gap: theme.spacing(2),
   position: 'relative',
-  [theme.breakpoints.down('md')]: {
-    flexDirection: 'column',
-    gap: theme.spacing(2),
-  },
 }));
 
 const IllustrationContainer = styled(Box)(({ theme }) => ({
@@ -32,39 +29,34 @@ const IllustrationContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  maxWidth: '50%',
-  [theme.breakpoints.down('md')]: {
-    flex: 'none',
-    width: '100%',
-    maxWidth: '300px',
-  },
+  maxWidth: { xs: '100%', md: '50%' },
+  padding: { xs: theme.spacing(2), md: 0 },
 }));
 
 const LoginBox = styled(Box)(({ theme }) => ({
-  width: '100%',
-  maxWidth: '350px',
+  width: '25%',
+  maxWidth: { xs: '40%', sm: '200px' },
   backgroundColor: '#fff',
   borderRadius: '15px',
   boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-  padding: theme.spacing(3),
+  padding: '10px',
+  marginTop: '10px',
   display: 'flex',
-  marginLeft:'120px',
-  maxHeight:'450px',
   flexDirection: 'column',
+  marginRight: '200px',
   alignItems: 'center',
-  [theme.breakpoints.down('sm')]: {
-    maxWidth: '90%',
-    padding: theme.spacing(2),
-  },
+  height: '400px',
+  maxHeight: { xs: 'auto', sm: '550px' },
 }));
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
-  width: '100%',
+  width: '80%',
   margin: theme.spacing(2, 0),
   '& .MuiInputBase-input': {
     background: '#fff',
-    padding: theme.spacing(1.5),
+    padding: { xs: theme.spacing(1), sm: theme.spacing(1.5) },
     borderRadius: '8px',
+    fontSize: { xs: '0.8rem', sm: '0.9rem' },
   },
   '& .MuiOutlinedInput-root': {
     '& fieldset': {
@@ -80,12 +72,12 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
-  width: '100%',
-  height: '48px',
+  width: '40%',
+  height: { xs: '40px', sm: '58px' },
   margin: theme.spacing(1, 0),
   backgroundColor: '#1976d2',
   color: '#fff',
-  fontSize: '1em',
+  fontSize: { xs: '0.8rem', sm: '0.9rem' },
   fontWeight: 'bold',
   borderRadius: '8px',
   textTransform: 'none',
@@ -102,11 +94,11 @@ const GoogleButton = styled(Button)(({ theme }) => ({
   width: '100%',
   backgroundColor: '#fff',
   color: '#757575',
-  fontSize: '1rem',
+  fontSize: { xs: '0.8rem', sm: '0.9rem' },
   fontWeight: 'bold',
   border: '1px solid #d9d9d9',
   borderRadius: '8px',
-  padding: theme.spacing(1.5),
+  padding: { xs: theme.spacing(1), sm: theme.spacing(1.5) },
   margin: theme.spacing(1, 0),
   boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
   transition: 'all 0.3s ease',
@@ -124,7 +116,7 @@ const ForgotPasswordButton = styled(Button)(({ theme }) => ({
   color: '#1976d2',
   backgroundColor: 'transparent',
   border: 'none',
-  fontSize: '14px',
+  fontSize: { xs: '12px', sm: '14px' },
   cursor: 'pointer',
   textDecoration: 'underline',
   fontWeight: 'bold',
@@ -139,6 +131,7 @@ export default function Login() {
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
+    passcode: "",
   });
 
   const [showForgotPassword, setShowForgotPassword] = useState(false);
@@ -149,11 +142,25 @@ export default function Login() {
 
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
-    setLoginData({ ...loginData, [name]: value });
+    // For passcode, ensure only digits are entered and limit to 6 characters
+    if (name === "passcode") {
+      const digitsOnly = value.replace(/[^0-9]/g, '');
+      setLoginData({ ...loginData, [name]: digitsOnly.slice(0, 6) });
+    } else {
+      setLoginData({ ...loginData, [name]: value });
+    }
   };
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
+
+    // Validate passcode: must be exactly 6 digits
+    const passcodeRegex = /^\d{6}$/;
+    if (!passcodeRegex.test(loginData.passcode)) {
+      toast.error("Passcode must be a 6-digit number.");
+      return;
+    }
+
     toast.success("Successfully Logged In");
     localStorage.setItem("token", "mock-token");
 
@@ -170,7 +177,7 @@ export default function Login() {
       }, 1500);
     }
 
-    setLoginData({ email: "", password: "" });
+    setLoginData({ email: "", password: "", passcode: "" });
   };
 
   const openForgotPassword = () => {
@@ -211,8 +218,8 @@ export default function Login() {
         <IconButton
           sx={{
             position: 'absolute',
-            top: '16px',
-            left: '16px',
+            top: { xs: '8px', sm: '16px' },
+            left: { xs: '8px', sm: '16px' },
             color: '#1976d2',
           }}
         >
@@ -225,19 +232,28 @@ export default function Login() {
             src={illustration}
             alt="Login Illustration"
             style={{
-              maxWidth: '750px',
-              height: '500px',
-              maxHeight: '600px',
+              maxWidth: { xs: '100%', sm: '500px', md: '750px' },
+              height: 'auto',
+              maxHeight: { xs: '300px', sm: '400px', md: '500px' },
             }}
           />
         </IllustrationContainer>
 
         {/* Right Side: Login Box */}
         <LoginBox>
-          <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold', color: '#333' }}>
+          <Typography 
+            variant="h5" 
+            sx={{ 
+              mb: 3, 
+              fontWeight: 'bold', 
+              color: '#333',
+              fontSize: { xs: '1.5rem', sm: '1.75rem' },
+              textAlign: 'center',
+            }}
+          >
             Login
           </Typography>
-          <form onSubmit={handleLoginSubmit} style={{ width: '100%' }}>
+          <form onSubmit={handleLoginSubmit} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <StyledTextField
               variant="outlined"
               name="email"
@@ -255,10 +271,18 @@ export default function Login() {
               value={loginData.password}
               onChange={handleLoginChange}
             />
+            <StyledTextField
+              variant="outlined"
+              name="passcode"
+              placeholder="Passcode"
+              type="text"
+              required
+              value={loginData.passcode}
+              onChange={handleLoginChange}
+              inputProps={{ maxLength: 6 }} // Limit input to 6 characters
+              // helperText="Enter a 6-digit passcode"
+            />
             <StyledButton type="submit">Login</StyledButton>
-            {/* <ForgotPasswordButton onClick={openForgotPassword}>
-              Forgot Password?
-            </ForgotPasswordButton> */}
           </form>
         </LoginBox>
       </MainContainer>
@@ -270,9 +294,9 @@ export default function Login() {
           padding: '10px',
           color: '#666',
           fontStyle: 'italic',
-          fontSize: '1.6em',
+          fontSize: { xs: '1rem', sm: '1.2rem', md: '1.6rem' },
           position: 'absolute',
-          bottom: '10px',
+          bottom: { xs: '5px', sm: '10px' },
           width: '100%',
         }}
       >
@@ -280,7 +304,11 @@ export default function Login() {
       </Typography>
 
       <Dialog open={showForgotPassword} onClose={closeForgotPassword} maxWidth="xs" fullWidth>
-        <DialogTitle sx={{ textAlign: 'center', fontSize: '22px', color: '#333' }}>
+        <DialogTitle sx={{ 
+          textAlign: 'center', 
+          fontSize: { xs: '18px', sm: '22px' },
+          color: '#333' 
+        }}>
           {forgotPasswordStep === 1 && "Enter Your Email"}
           {forgotPasswordStep === 2 && "Reset Password"}
           <IconButton
